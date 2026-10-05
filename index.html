@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Let's make a Baskin Robbins Icecream</title>
+
+    <script>
+  (function(d) {
+    var config = {
+      kitId: 'uch8suv',
+      scriptTimeout: 3000,
+      async: true
+    },
+    h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+  })(document);
+    </script>
+
+
+
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "agahnsangsoo2012", sans-serif;
+            font-weight: 500;
+            font-style: normal;
+            background: #FFFFFF;
+        }
+
+
+        
+
+        #screen1 {
+            min-height: 100vh;
+            padding: 60px 40px;
+        }
+
+        #screen1 h1 {
+            text-align: center;
+            font-family: agahnsangsoo2012, sans-serif;
+            font-weight: 500;
+            font-size: 2.8rem;
+            margin: 0 0 80px 0;
+            letter-spacing: -1px;
+        }
+
+        .flavorRow {
+            display: flex;
+            justify-content: center;
+            gap: 90px;
+            flex-wrap: wrap;
+        }
+
+        .flavorCard {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .scoop {
+            width: 180px;
+            height: 180px;
+            display: block;
+            margin: 0 auto 20px auto;
+            transition: transform 0.15s;
+        }
+
+        .flavorCard:hover .scoop {
+            transform: translateY(-8px);
+        }
+
+        .flavorCard p {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin: 0;
+        }
+    
+        
+
+
+        #screen2 {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .topBar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+        }
+
+        .topBar h2 {
+            margin: 0;
+            font-family: "agahnsangsoo2012", sans-serif;
+        }
+
+        .btnGroup {
+            display: flex;
+            gap: 10px;
+        }
+
+        .topBar button {
+            font-family: "agahnsangsoo2012", sans-serif;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #333;
+            background: white;
+            cursor: pointer;
+        }
+
+        #canvas {
+            position: relative;
+            width: 100%;
+            height: 80vh;
+            overflow: hidden;
+        }
+
+        .block {
+            position: absolute;
+        }
+
+        .word {
+            position: absolute;
+            font-family: "agahnsangsoo2012", sans-serif;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+
+
+
+
+
+<body>
+
+    
+    <div id="screen1">
+        <h1>Let's make a Baskin Robbins Icecream</h1>
+        <div class="flavorRow">
+            <div class="flavorCard" onclick="selectFlavor('rainbow')">
+            <img class="scoop rainbow" src="rainbow.png">
+            <p>RAINBOW SHERBET</p>
+        </div>
+
+            <div class="flavorCard" onclick="selectFlavor('shooting')">
+            <img class="scoop shooting" src="star.png">
+            <p>SHOOTING STAR</p>
+        </div>
+
+            <div class="flavorCard" onclick="selectFlavor('choco')">
+            <img class="scoop choco" src="forest.png">
+            <p>CHOCOLATE FOREST</p>
+        </div>
+    </div>
+</div>
+
+
+
+
+    <div id="screen2">
+        <div class="topBar">
+            <button id="backBtn">
+            ← RETRY</button>
+            <h2 id="flavorTitle"></h2>
+        <div class="btnGroup">
+            <button id="colorBtn">
+            COLOR</button>
+            <button id="textBtn">
+            TEXT</button>
+            </div>
+        </div>
+
+        <div id="canvas">
+            <div id="shapesLayer"></div>
+            <div id="textLayer"></div>
+        </div>
+    </div>
+
+
+    <script>
+        let flavors = {
+            rainbow:  { name: "RAINBOW SHARBET", colors: ["#FFFEF9", "#FF91B0", "#B3365D", "#FFB168"] },
+            shooting: { name: "SHOOTING STAR",       colors: ["#FFFEF9", "#F24530", "#2462A6", "#8DE2FF", "#FF9CCE"] },
+            choco:    { name: "CHOCOLATE FOREST",     colors: ["#FFFEF9", "#CACF92", "#916043", "#48332B", "#6D682C"] }
+        };
+
+        
+        let ingredients = {
+            rainbow:  ["Orange", "Raspberry", "Pineapple"],
+            shooting: ["Blueberry", "Vanilla", "Cherry Syrup", "Blue Popping Candy"],
+            choco:    ["Green Tea", "Chocolate", "Cream Sandwich Cookie", "Choco Pretzel"]
+        };
+
+        let currentColors = [];   
+        let currentWords = [];    
+        let shapeElements = [];   
+
+        
+        function selectFlavor(key) {
+            currentColors = flavors[key].colors;
+            currentWords = ingredients[key];
+            flavorTitle.innerHTML = flavors[key].name;
+
+            screen1.style.display = "none";
+            screen2.style.display = "block";
+
+            makeShapes();
+            makeWords();
+        }
+
+        //모양
+        function makeShapes() {
+            shapesLayer.innerHTML = "";
+            shapeElements = [];
+
+            for (let i = 1; i < 40; i++) {
+                let color = currentColors[Math.floor(Math.random() * currentColors.length)];
+                let w = Math.random() * 220 + 40;     
+                let h = Math.random() * 220 + 40;
+                let x = Math.random() * 100;          
+                let y = Math.random() * 100;
+                let isCircle = Math.random() < 0.3;   
+
+                let div = document.createElement("div");
+                div.className = "block";
+                div.style.background = color;
+                div.style.width = w + "px";
+                div.style.height = h + "px";
+                div.style.left = x + "%";
+                div.style.top = y + "%";
+                div.style.borderRadius = isCircle ? "50%" : "0px";
+
+                shapesLayer.appendChild(div);
+                shapeElements.push(div);  
+            }
+        }
+
+        
+        //색상
+        function shuffleShapeColors() {
+            for (let i = 0; i < shapeElements.length; i++) {
+                let color = currentColors[Math.floor(Math.random() * currentColors.length)];
+                let w = Math.random() * 220 + 40;     // 40 ~ 260px
+                let h = Math.random() * 220 + 40;
+                let x = Math.random() * 100;          // 0 ~ 100%
+                let y = Math.random() * 100;
+                let isCircle = Math.random() < 0.3;   // 30% 확률로 동그라미
+
+                shapeElements[i].style.background = color;
+                shapeElements[i].style.width = w + "px";
+                shapeElements[i].style.height = h + "px";
+                shapeElements[i].style.left = x + "%";
+                shapeElements[i].style.top = y + "%";
+                shapeElements[i].style.borderRadius = isCircle ? "50%" : "0px";
+            }
+        }
+
+        //글자
+        function makeWords() {
+            textLayer.innerHTML = "";
+
+            for (let i = 1; i < 18; i++) {
+                let word = currentWords[Math.floor(Math.random() * currentWords.length)];
+                let color = currentColors[Math.floor(Math.random() * currentColors.length)];
+                let size = Math.random() * 46 + 14;   // 14 ~ 60px
+                let x = Math.random() * 85;
+                let y = Math.random() * 90;
+
+                textLayer.innerHTML += `<div class="word" style="
+                    color:${color};
+                    font-size:${size}px;
+                    left:${x}%;
+                    top:${y}%;
+                ">${word}</div>`;
+            }
+        }
+
+        colorBtn.onclick = function () {
+            shuffleShapeColors();
+        }
+
+        textBtn.onclick = function () {
+            makeWords();
+        }
+
+        backBtn.onclick = function () {
+            screen2.style.display = "none";
+            screen1.style.display = "block";
+        }
+    </script>
+
+</body>
+</html>
